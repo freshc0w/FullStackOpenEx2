@@ -1,8 +1,42 @@
 const express = require('express');
 const app = express();
 
+// CORS policy
+const cors = require('cors');
+
+// morgan middleware
+const morgan = require('morgan');
+
 // for receiving data: POST
 app.use(express.json());
+
+// CORS policy
+app.use(cors());
+
+// middleware
+const requestLogger = (request, response, next) => {
+	console.log('Method:', request.method);
+	console.log('Path:  ', request.path);
+	console.log('Body:  ', request.body);
+	console.log('---');
+	next();
+};
+app.use(requestLogger);
+
+// morgan middleware custom fnc for POST
+const reqMorganLogger = (tokens, req, res) => {
+	return [
+		tokens.method(req, res),
+		tokens.url(req, res),
+		tokens.status(req, res),
+		tokens.res(req, res, 'content-length'),
+		'-',
+		tokens['response-time'](req, res),
+		'ms',
+        JSON.stringify(req.body)
+	].join(' ');
+};
+app.use(morgan(reqMorganLogger));
 
 let data = [
 	{
@@ -74,6 +108,7 @@ const generateId = max => {
 // POSTING content
 app.post('/api/persons', (req, res) => {
 	const body = req.body;
+    console.log(req.body);
 
 	const handleError = errorMsg => {
 		return res.status(400).json({
