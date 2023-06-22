@@ -67,31 +67,37 @@ app.delete('/api/persons/:id', (req, res) => {
  * Max value probably would be 100,000 to lower the chance
  * of two people having the same id
  */
-const generateId = (max) => {
-    return Math.floor(Math.random() * max);
-}
+const generateId = max => {
+	return Math.floor(Math.random() * max);
+};
 
 // POSTING content
 app.post('/api/persons', (req, res) => {
 	const body = req.body;
 
-	// If no content was found in body, generate 404 bad req.
-	if (!body.name) {
+	const handleError = errorMsg => {
 		return res.status(400).json({
-			error: 'name missing',
+			error: errorMsg,
 		});
-	}
+	};
 
-    const person = {
-        name: body.name,
-        number: body.number || 'No number provided',
-        id: generateId(100000),
-    }
+	// If no name or number found, or if the name already exist
+	// in the phone book, generate error 400.
+	if (!body.name) return handleError('Name missing');
+	if (!body.number) return handleError('Number missing');
+	if (data.some(d => d.name === body.name))
+		return handleError('Name already exists in the phonebook');
 
-    // Add person to collection of data
-    data = data.concat(person);
+	const person = {
+		name: body.name,
+		number: body.number,
+		id: generateId(100000),
+	};
 
-    res.json(person);
+	// Add person to collection of data
+	data = data.concat(person);
+
+	res.json(person);
 });
 
 // Configure to PORT 3001
