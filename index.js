@@ -136,7 +136,10 @@ app.post('/api/persons', (req, res) => {
 });
 
 // Configure to PORT 3001
-const PORT = 3001;
+// const PORT = 3001;
+
+// Configure to RENDER's PORT or PORT 3001 if none exists
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
 	console.log(`server running on port ${PORT}`);
 });
