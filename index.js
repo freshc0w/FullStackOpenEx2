@@ -57,10 +57,42 @@ app.get('/info', (req, res) => {
 
 // Deleting a resource
 app.delete('/api/persons/:id', (req, res) => {
-    const id = Number(req.params.id);
-    data = data.filter(d => d.id !== id);
-    res.status(204).end();
-})
+	const id = Number(req.params.id);
+	data = data.filter(d => d.id !== id);
+	res.status(204).end();
+});
+
+/**
+ * Generates a random id based on a max value combinations.
+ * Max value probably would be 100,000 to lower the chance
+ * of two people having the same id
+ */
+const generateId = (max) => {
+    return Math.floor(Math.random() * max);
+}
+
+// POSTING content
+app.post('/api/persons', (req, res) => {
+	const body = req.body;
+
+	// If no content was found in body, generate 404 bad req.
+	if (!body.name) {
+		return res.status(400).json({
+			error: 'name missing',
+		});
+	}
+
+    const person = {
+        name: body.name,
+        number: body.number || 'No number provided',
+        id: generateId(100000),
+    }
+
+    // Add person to collection of data
+    data = data.concat(person);
+
+    res.json(person);
+});
 
 // Configure to PORT 3001
 const PORT = 3001;
