@@ -55,6 +55,13 @@ app.get('/info', (req, res) => {
 	);
 });
 
+// Deleting a resource
+app.delete('/api/persons/:id', (req, res) => {
+    const id = Number(req.params.id);
+    data = data.filter(d => d.id !== id);
+    res.status(204).end();
+})
+
 // Configure to PORT 3001
 const PORT = 3001;
 app.listen(PORT, () => {
