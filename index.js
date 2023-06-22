@@ -36,6 +36,11 @@ app.get('/api/persons', (req, res) => {
 	res.json(data);
 });
 
+// render page at localhost:3001/info
+app.get('/info', (req, res) => {
+	res.send(`<p>Phonebook has info for ${data.length} people</p><p>${new Date()}</p>`);
+});
+
 // Configure to PORT 3001
 const PORT = 3001;
 app.listen(PORT, () => {
