@@ -36,9 +36,23 @@ app.get('/api/persons', (req, res) => {
 	res.json(data);
 });
 
+// Fetching a single resource
+app.get('/api/persons/:id', (req, res) => {
+	// convert param id to number format first
+	const id = Number(req.params.id);
+
+	const person = data.find(p => p.id === id);
+
+	person ? res.json(person) : res.status(404).end();
+});
+
 // render page at localhost:3001/info
 app.get('/info', (req, res) => {
-	res.send(`<p>Phonebook has info for ${data.length} people</p><p>${new Date()}</p>`);
+	res.send(
+		`<p>Phonebook has info for ${
+			data.length
+		} people</p><p>${new Date()}</p>`
+	);
 });
 
 // Configure to PORT 3001
