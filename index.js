@@ -1,5 +1,11 @@
+// .env file containing port and mongodb url
+require('dotenv').config();
+
+// Express config
 const express = require('express');
 const app = express();
+
+const Person = require('./models/person.js');
 
 // CORS policy
 const cors = require('cors');
@@ -70,10 +76,19 @@ app.get('/', (req, res) => {
 	res.send('<h1>Hello World!</h1>');
 });
 
-// GET request for /api/persons
+// GET request for /api/persons w/o db
+/*
 app.get('/api/persons', (req, res) => {
 	res.json(data);
 });
+*/
+
+// GET request for /api/persons w db
+app.get('/api/persons', (req, res) => {
+	Person.find({}).then(p => {
+		res.json(p);
+	})
+})
 
 // Fetching a single resource
 app.get('/api/persons/:id', (req, res) => {

@@ -29,3 +29,6 @@ Content-Type: application/json
 ###
 DELETE https://fsophonebook-5w03.onrender.com/api/persons/1 HTTP/1.1
 Content-Type: application/json
+
+###
+GET http://localhost:3001/api/persons
