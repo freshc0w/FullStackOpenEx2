@@ -32,3 +32,15 @@ Content-Type: application/json
 
 ###
 GET http://localhost:3001/api/persons
+
+###
+GET http://localhost:3001/api/persons/64950f5afb28eb117a5b435b
+
+###
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+    "name": "Freshcow",
+    "number": "222222"
+}

@@ -22,8 +22,6 @@ app.use(cors());
 // Display static react app
 app.use(express.static('build'));
 
-
-
 // middleware
 const requestLogger = (request, response, next) => {
 	console.log('Method:', request.method);
@@ -44,7 +42,7 @@ const reqMorganLogger = (tokens, req, res) => {
 		'-',
 		tokens['response-time'](req, res),
 		'ms',
-        JSON.stringify(req.body)
+		JSON.stringify(req.body),
 	].join(' ');
 };
 app.use(morgan(reqMorganLogger));
@@ -87,17 +85,26 @@ app.get('/api/persons', (req, res) => {
 app.get('/api/persons', (req, res) => {
 	Person.find({}).then(p => {
 		res.json(p);
-	})
-})
+	});
+});
 
-// Fetching a single resource
+// Fetching a single resource (w/o db)
+/**
+ app.get('/api/persons/:id', (req, res) => {
+	 // convert param id to number format first
+	 const id = Number(req.params.id);
+ 
+	 const person = data.find(p => p.id === id);
+ 
+	 person ? res.json(person) : res.status(404).end();
+ });
+ */
+
+// (WITH DB)
 app.get('/api/persons/:id', (req, res) => {
-	// convert param id to number format first
-	const id = Number(req.params.id);
-
-	const person = data.find(p => p.id === id);
-
-	person ? res.json(person) : res.status(404).end();
+	Person.findById(req.params.id).then(p => {
+		res.json(p);
+	});
 });
 
 // render page at localhost:3001/info
@@ -125,34 +132,55 @@ const generateId = max => {
 	return Math.floor(Math.random() * max);
 };
 
-// POSTING content
+// POSTING content (w/o db)
+/**
+ app.post('/api/persons', (req, res) => {
+	 const body = req.body;
+	 console.log(req.body);
+ 
+	 const handleError = errorMsg => {
+		 return res.status(400).json({
+			 error: errorMsg,
+		 });
+	 };
+ 
+	 // If no name or number found, or if the name already exist
+	 // in the phone book, generate error 400.
+	 if (!body.name) return handleError('Name missing');
+	 if (!body.number) return handleError('Number missing');
+	 if (data.some(d => d.name === body.name))
+		 return handleError('Name already exists in the phonebook');
+ 
+	 const person = {
+		 name: body.name,
+		 number: body.number,
+		 id: generateId(100000),
+	 };
+ 
+	 // Add person to collection of data
+	 data = data.concat(person);
+ 
+	 res.json(person);
+ });
+ */
+
+// (WITH DB)
 app.post('/api/persons', (req, res) => {
 	const body = req.body;
-    console.log(req.body);
 
-	const handleError = errorMsg => {
-		return res.status(400).json({
-			error: errorMsg,
-		});
-	};
+	// If not given name, return status 400
+	if (body.name === undefined) {
+		return res.status(400).json({ error: 'name missing' });
+	}
 
-	// If no name or number found, or if the name already exist
-	// in the phone book, generate error 400.
-	if (!body.name) return handleError('Name missing');
-	if (!body.number) return handleError('Number missing');
-	if (data.some(d => d.name === body.name))
-		return handleError('Name already exists in the phonebook');
-
-	const person = {
+	const person = new Person({
 		name: body.name,
 		number: body.number,
-		id: generateId(100000),
-	};
+	})
 
-	// Add person to collection of data
-	data = data.concat(person);
-
-	res.json(person);
+	person.save().then(savedPerson => {
+		res.json(savedPerson);
+	})
 });
 
 // Configure to PORT 3001
