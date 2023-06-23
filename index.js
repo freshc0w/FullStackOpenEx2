@@ -228,14 +228,12 @@ app.post('/api/persons', (req, res, next) => {
 
 // Updating the number of the same person
 app.put('/api/persons/:id', (req, res, next) => {
-	const body = req.body;
+	const { name, number } = req.body;
 
-	const person = {
-		name: body.name,
-		number: body.number,
-	};
-
-	Person.findByIdAndUpdate(req.params.id, person, { new: true })
+	// For put operations, validators will be defauly false. Must put true.
+	Person.findByIdAndUpdate(req.params.id,
+		{ name, number },
+		{ new: true, runValidators: true, context: 'query' })
 		.then(updatedPerson => {
 			res.json(updatedPerson);
 		})
