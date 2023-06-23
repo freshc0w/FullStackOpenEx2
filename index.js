@@ -16,6 +16,8 @@ app.use(cors());
 // Display static react app
 app.use(express.static('build'));
 
+
+
 // middleware
 const requestLogger = (request, response, next) => {
 	console.log('Method:', request.method);
