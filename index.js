@@ -110,9 +110,9 @@ app.get('/api/persons', (req, res) => {
  app.get('/api/persons/:id', (req, res) => {
 	 // convert param id to number format first
 	 const id = Number(req.params.id);
- 
+
 	 const person = data.find(p => p.id === id);
- 
+
 	 person ? res.json(person) : res.status(404).end();
  });
  */
@@ -177,29 +177,29 @@ const generateId = max => {
  app.post('/api/persons', (req, res) => {
 	 const body = req.body;
 	 console.log(req.body);
- 
+
 	 const handleError = errorMsg => {
 		 return res.status(400).json({
 			 error: errorMsg,
 		 });
 	 };
- 
+
 	 // If no name or number found, or if the name already exist
 	 // in the phone book, generate error 400.
 	 if (!body.name) return handleError('Name missing');
 	 if (!body.number) return handleError('Number missing');
 	 if (data.some(d => d.name === body.name))
 		 return handleError('Name already exists in the phonebook');
- 
+
 	 const person = {
 		 name: body.name,
 		 number: body.number,
 		 id: generateId(100000),
 	 };
- 
+
 	 // Add person to collection of data
 	 data = data.concat(person);
- 
+
 	 res.json(person);
  });
  */
@@ -231,9 +231,11 @@ app.put('/api/persons/:id', (req, res, next) => {
 	const { name, number } = req.body;
 
 	// For put operations, validators will be defauly false. Must put true.
-	Person.findByIdAndUpdate(req.params.id,
+	Person.findByIdAndUpdate(
+		req.params.id,
 		{ name, number },
-		{ new: true, runValidators: true, context: 'query' })
+		{ new: true, runValidators: true, context: 'query' }
+	)
 		.then(updatedPerson => {
 			res.json(updatedPerson);
 		})
