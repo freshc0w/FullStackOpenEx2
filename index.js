@@ -47,6 +47,20 @@ const reqMorganLogger = (tokens, req, res) => {
 };
 app.use(morgan(reqMorganLogger));
 
+const unknownEndpoint = (request, response, next) => {
+	response.status(404).send({ error: 'unknown endpoint' });
+};
+
+const errorHandler = (error, request, response, next) => {
+	console.error(error.message);
+
+	if (error.name === 'CastError') {
+		return response.status(400).send({ error: 'malformatted id' });
+	}
+
+	next(error);
+};
+
 let data = [
 	{
 		id: 1,
@@ -116,11 +130,22 @@ app.get('/info', (req, res) => {
 	);
 });
 
-// Deleting a resource
-app.delete('/api/persons/:id', (req, res) => {
-	const id = Number(req.params.id);
-	data = data.filter(d => d.id !== id);
-	res.status(204).end();
+// Deleting a resource (W/O db)
+/**
+ app.delete('/api/persons/:id', (req, res) => {
+	 const id = Number(req.params.id);
+	 data = data.filter(d => d.id !== id);
+	 res.status(204).end();
+ });
+ */
+
+// Deleting a resource (WITH DB)
+app.delete('/api/persons/:id', (req, res, next) => {
+	Person.findByIdAndRemove(req.params.id)
+		.then(result => {
+			res.status(204).end();
+		})
+		.catch(err => next(err));
 });
 
 /**
@@ -176,12 +201,16 @@ app.post('/api/persons', (req, res) => {
 	const person = new Person({
 		name: body.name,
 		number: body.number,
-	})
+	});
 
 	person.save().then(savedPerson => {
 		res.json(savedPerson);
-	})
+	});
 });
+
+// use error middleware
+app.use(unknownEndpoint);
+app.use(errorHandler);
 
 // Configure to PORT 3001
 // const PORT = 3001;
