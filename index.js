@@ -121,13 +121,23 @@ app.get('/api/persons/:id', (req, res) => {
 	});
 });
 
-// render page at localhost:3001/info
+// render page at localhost:3001/info (W/0 DB)
+/*
 app.get('/info', (req, res) => {
 	res.send(
 		`<p>Phonebook has info for ${
 			data.length
 		} people</p><p>${new Date()}</p>`
 	);
+});
+*/
+// Render page info (with db)
+app.get('/info', (req, res) => {
+	Person.find({}).then(result => {
+		res.send(
+			`<p>Phonebook has info for ${result.length} people</p><p>${new Date()}</p>`
+		);
+	})
 });
 
 // Deleting a resource (W/O db)
