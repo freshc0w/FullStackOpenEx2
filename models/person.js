@@ -16,7 +16,11 @@ mongoose
     })
 
 const personSchema = new mongoose.Schema({
-    name: String,
+    // Mongoose validation
+    name: {
+        type: String,
+        minLength: 3,
+    },
     number: String,
 })
 

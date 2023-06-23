@@ -56,6 +56,9 @@ const errorHandler = (error, request, response, next) => {
 
 	if (error.name === 'CastError') {
 		return response.status(400).send({ error: 'malformatted id' });
+	} else if (error.name === 'ValidationError') {
+		// Invalid params from mongoose validation schema
+		return response.status(400).json({ error: error.message });
 	}
 
 	next(error);
@@ -135,9 +138,11 @@ app.get('/info', (req, res) => {
 app.get('/info', (req, res) => {
 	Person.find({}).then(result => {
 		res.send(
-			`<p>Phonebook has info for ${result.length} people</p><p>${new Date()}</p>`
+			`<p>Phonebook has info for ${
+				result.length
+			} people</p><p>${new Date()}</p>`
 		);
-	})
+	});
 });
 
 // Deleting a resource (W/O db)
@@ -200,7 +205,7 @@ const generateId = max => {
  */
 
 // (WITH DB)
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
 	const body = req.body;
 
 	// If not given name, return status 400
@@ -213,9 +218,12 @@ app.post('/api/persons', (req, res) => {
 		number: body.number,
 	});
 
-	person.save().then(savedPerson => {
-		res.json(savedPerson);
-	});
+	person
+		.save()
+		.then(savedPerson => {
+			res.json(savedPerson);
+		})
+		.catch(error => next(error));
 });
 
 // Updating the number of the same person
